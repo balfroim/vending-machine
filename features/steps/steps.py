@@ -89,21 +89,22 @@ Feature: Product Feature
     Then the machine displays "Insert Coins"
 """
 from behave import given, when, then
+from src.vending_machine import VendingMachine
 from src.model.dime import Dime
 from src.model.nickel import Nickel
 from src.model.penny import Penny
 from src.model.quarter import Quarter
 
 
-
 @given(u'I have a "Quarter"')
 def step_impl(context):
+    context.vending_machine = VendingMachine()
     context.quarter = Quarter()
 
 
 @when(u'I insert a "Quarter" into the vending machine')
 def step_impl(context):
-    context.vending_machine.insert_coins(context.quarter)
+    context.vending_machine.insert_coin(context.quarter)
 
 
 @then(u'the vending machine accepts the "Quarter"')
@@ -113,12 +114,13 @@ def step_impl(context):
 
 @given(u'I have a "Dime"')
 def step_impl(context):
+    context.vending_machine = VendingMachine()
     context.dime = Dime()
 
 
 @when(u'I insert a "Dime" into the vending machine')
 def step_impl(context):
-    context.vending_machine.insert_coins(context.dime)
+    context.vending_machine.insert_coin(context.dime)
 
 
 @then(u'the vending machine accepts the "Dime"')
@@ -128,12 +130,13 @@ def step_impl(context):
 
 @given(u'I have a "Nickel"')
 def step_impl(context):
+    context.vending_machine = VendingMachine()
     context.nickel = Nickel()
 
 
 @when(u'I insert a "Nickel" into the vending machine')
 def step_impl(context):
-    context.vending_machine.insert_coins(context.nickel)
+    context.vending_machine.insert_coin(context.nickel)
 
 
 @then(u'the vending machine accepts the "Nickel"')
@@ -143,12 +146,13 @@ def step_impl(context):
 
 @given(u'I have a "Penny"')
 def step_impl(context):
+    context.vending_machine = VendingMachine()
     context.penny = Penny()
 
 
 @when(u'I insert a "Penny" into the vending machine')
 def step_impl(context):
-    context.vending_machine.insert_coins(context.penny)
+    context.vending_machine.insert_coin(context.penny)
 
 
 @then(u'the vending machine does not accepts the coin')
@@ -158,7 +162,7 @@ def step_impl(context):
 
 @given(u'I am a vendor')
 def step_impl(context):
-    pass
+    context.vending_machine = VendingMachine()
 
 
 @when(u'I go to order an item')
@@ -173,12 +177,13 @@ def step_impl(context):
 
 @given(u'order an item for ".25" dollar')
 def step_impl(context):
-    pass
+    context.vending_machine = VendingMachine()
+    context.vending_machine.order_item("Chips", .25)
 
 
 @when(u'I insert ".25"')
 def step_impl(context):
-    context.vending_machine.insert_coins(Quarter())
+    context.vending_machine.insert_coin(Quarter())
 
 
 @then(u'the displays says "Thank you"')
@@ -188,34 +193,37 @@ def step_impl(context):
 
 @given(u'order an item for ".50" dollar')
 def step_impl(context):
-    pass
+    context.vending_machine = VendingMachine()
+    context.vending_machine.order_item("Chips", .50)
 
 
 @given(u'I purchase an item for ".50"')
 def step_impl(context):
-    pass
+    context.vending_machine = VendingMachine()
+    context.vending_machine.order_item("Chips", .50)
 
 
 @given(u'I have inserted ".25"')
 def step_impl(context):
-    context.vending_machine.insert_coins(Quarter())
+    context.vending_machine = VendingMachine()
+    context.vending_machine.insert_coin(Quarter())
 
 
 @given(u'display says "Insert Coins"')
 def step_impl(context):
-    pass
+    context.vending_machine = VendingMachine()
+    assert context.vending_machine.display == "Insert Coins"
 
 
 @when(u'I insert another ".25"')
 def step_impl(context):
-    context.vending_machine.insert_coins(Quarter())
+    context.vending_machine.insert_coin(Quarter())
 
 
 @given(u'I have inserted ".30"')
 def step_impl(context):
-    context.vending_machine.insert_coins(Quarter())
-    context.vending_machine.insert_coins(Quarter())
-    context.vending_machine.insert_coins(Dime())
+    context.vending_machine = VendingMachine()
+    context.vending_machine.insert_coin(Quarter())
 
 
 @then(u'".05" cents is returned')
@@ -225,7 +233,8 @@ def step_impl(context):
 
 @given(u'I order "Chips" for ".50"')
 def step_impl(context):
-    pass
+    context.vending_machine = VendingMachine()
+    context.vending_machine.order_item("Chips", .50)
 
 
 @when(u'I select the respective button')
@@ -235,13 +244,13 @@ def step_impl(context):
 
 @when(u'I have inserted "2" "Quarter"')
 def step_impl(context):
-    context.vending_machine.insert_coins(Quarter())
-    context.vending_machine.insert_coins(Quarter())
+    context.vending_machine.insert_coin(Quarter())
+    context.vending_machine.insert_coin(Quarter())
 
 
 @then(u'the product is dispensed')
 def step_impl(context):
-    pass
+    assert context.vending_machine.dispensed_product == "Chips"
 
 
 @then(u'the machine displays "Thank you"')
@@ -251,27 +260,33 @@ def step_impl(context):
 
 @given(u'I order "Cola" for "1.00"')
 def step_impl(context):
-    pass
+    context.vending_machine = VendingMachine()
+    context.vending_machine.order_item("Cola", 1.00)
+
 
 
 @when(u'I have inserted "4" "Quarter"')
 def step_impl(context):
-    pass
+    context.vending_machine.insert_coin(Quarter())
+    context.vending_machine.insert_coin(Quarter())
+    context.vending_machine.insert_coin(Quarter())
+    context.vending_machine.insert_coin(Quarter())
 
 
 @given(u'I order "Candy" for ".65"')
 def step_impl(context):
-    pass
+    context.vending_machine = VendingMachine()
+    context.vending_machine.order_item("Candy", .65)
 
 
 @when(u'I have inserted "1" "Dime"')
 def step_impl(context):
-    pass
+    context.vending_machine.insert_coin(Dime())
 
 
 @when(u'I have inserted "1" "Nickle"')
 def step_impl(context):
-    pass
+    context.vending_machine.insert_coin(Nickel())
 
 
 @then(u'the machine displays "Insert Coins"')
