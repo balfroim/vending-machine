@@ -95,202 +95,91 @@ from src.model.dime import Dime
 from src.model.nickel import Nickel
 from src.model.penny import Penny
 from src.model.quarter import Quarter
+from src.model.coin import Coin
 from src.model.product import Product
 
 
-@given(u'I have a "Quarter"')
-def step_impl(context):
-    context.vending_machine = VendingMachine(Product('Chips', .50), CoinValidator())
-    context.quarter = Quarter()
+@given('I have a "{coin}"')
+def step_impl(context, coin):
+    context.coin = coin
+      
+@when('I insert a "{payment}" into the vending machine')
+def step_impl(context, payment):
+    product = Product('item', context.coin.value)
+    context.vending_machine = VendingMachine(product, CoinValidator(), product.price)
+    context.vending_machine.insert_coins(context.coin)
 
+@then('the vending machine accepts the "{coin}"')
+def step_impl(context, coin):
+    assert context.vending_machine.accepted_coins == [context.coin]
 
-@when(u'I insert a "Quarter" into the vending machine')
-def step_impl(context):
-    context.vending_machine.insert_coin(context.quarter)
-
-
-@then(u'the vending machine accepts the "Quarter"')
-def step_impl(context):
-    assert context.vending_machine.accepted_coins == [context.quarter]
-
-
-@given(u'I have a "Dime"')
-def step_impl(context):
-   context.vending_machine = VendingMachine(Product('Chips', .50), CoinValidator())
-   context.dime = Dime()
-
-
-@when(u'I insert a "Dime" into the vending machine')
-def step_impl(context):
-    context.vending_machine.insert_coin(context.dime)
-
-
-@then(u'the vending machine accepts the "Dime"')
-def step_impl(context):
-    assert context.vending_machine.accepted_coins == [context.dime]
-
-
-@given(u'I have a "Nickel"')
-def step_impl(context):
-   context.vending_machine = VendingMachine(Product('Chips', .50), CoinValidator())
-   context.nickel = Nickel()
-
-
-@when(u'I insert a "Nickel" into the vending machine')
-def step_impl(context):
-    context.vending_machine.insert_coin(context.nickel)
-
-
-@then(u'the vending machine accepts the "Nickel"')
-def step_impl(context):
-    assert context.vending_machine.accepted_coins == [context.nickel]
-
-
-@given(u'I have a "Penny"')
-def step_impl(context):
-   context.vending_machine = VendingMachine(Product('Chips', .50), CoinValidator())
-   context.penny = Penny()
-
-
-@when(u'I insert a "Penny" into the vending machine')
-def step_impl(context):
-    context.vending_machine.insert_coin(context.penny)
-
-
-@then(u'the vending machine does not accepts the coin')
+@then('the vending machine does not accepts the coin')
 def step_impl(context):
     assert context.vending_machine.accepted_coins == []
 
-
-@given(u'I am a vendor')
-def step_impl(context):
-   context.vending_machine = VendingMachine(Product('Chips', .50), CoinValidator())
-
-
-@when(u'I go to order an item')
+@given('I am a vendor')
 def step_impl(context):
     pass
 
-
-@then(u'the displays says "Insert Coins"')
+@when('I go to order an item')
 def step_impl(context):
-    assert context.vending_machine.display == "Insert Coins"
+    context.vending_machine = VendingMachine(None, CoinValidator(), 0)
 
-
-@given(u'order an item for ".25" dollar')
+@then('the displays says "Insert Coins"')
 def step_impl(context):
-   context.vending_machine = VendingMachine(Product('Chips', .50), CoinValidator())
-   context.vending_machine.order_item("Chips", .25)
+    assert context.vending_machine.display == 'Insert Coins'
 
+@given('order an item for "{price}" dollar')
+def step_impl(context, price):
+    context.price = float(price)
 
-@when(u'I insert ".25"')
+@when('I insert "{payment}"')
+def step_impl(context, payment):
+    product = Product('item', context.price)
+    context.vending_machine = VendingMachine(product, CoinValidator(), product.price)
+    context.vending_machine.insert_coins(Coin(float(payment)))
+
+@then('the displays says "Thank you"')
 def step_impl(context):
-    context.vending_machine.insert_coin(Quarter())
+    assert context.vending_machine.display == 'Thank You'
 
+@then('"{change}" cents is returned')
+def step_impl(context, change):
+    assert context.vending_machine.change == float(change)
 
-@then(u'the displays says "Thank you"')
-def step_impl(context):
-    assert context.vending_machine.display == "Thank you"
+@given('I order "{product}" for "{price}"')
+def step_impl(context, product, price):
+    context.product = Product(product, float(price))
 
-
-@given(u'order an item for ".50" dollar')
-def step_impl(context):
-   context.vending_machine = VendingMachine(Product('Chips', .50), CoinValidator())
-   context.vending_machine.order_item("Chips", .50)
-
-
-@given(u'I purchase an item for ".50"')
-def step_impl(context):
-   context.vending_machine = VendingMachine(Product('Chips', .50), CoinValidator())
-   context.vending_machine.order_item("Chips", .50)
-
-
-@given(u'I have inserted ".25"')
-def step_impl(context):
-   context.vending_machine = VendingMachine(Product('Chips', .50), CoinValidator())
-   context.vending_machine.insert_coin(Quarter())
-
-
-@given(u'display says "Insert Coins"')
-def step_impl(context):
-   context.vending_machine = VendingMachine(Product('Chips', .50), CoinValidator())
-   assert context.vending_machine.display == "Insert Coins"
-
-
-@when(u'I insert another ".25"')
-def step_impl(context):
-    context.vending_machine.insert_coin(Quarter())
-
-
-@given(u'I have inserted ".30"')
-def step_impl(context):
-   context.vending_machine = VendingMachine(Product('Chips', .50), CoinValidator())
-   context.vending_machine.insert_coin(Quarter())
-
-
-@then(u'".05" cents is returned')
-def step_impl(context):
-    assert context.vending_machine.returned_coins == [Nickel()]
-
-
-@given(u'I order "Chips" for ".50"')
-def step_impl(context):
-   context.vending_machine = VendingMachine(Product('Chips', .50), CoinValidator())
-   context.vending_machine.order_item("Chips", .50)
-
-
-@when(u'I select the respective button')
+@when('I select the respective button')
 def step_impl(context):
     pass
 
-
-@when(u'I have inserted "2" "Quarter"')
+@then('the product is dispensed')
 def step_impl(context):
-    context.vending_machine.insert_coin(Quarter())
-    context.vending_machine.insert_coin(Quarter())
+    assert context.vending_machine.product == context.product
 
-
-@then(u'the product is dispensed')
+@then('the machine displays "Insert Coins"')
 def step_impl(context):
-    assert context.vending_machine.dispensed_product == "Chips"
+    assert context.vending_machine.display == 'Insert Coins'
 
-
-@then(u'the machine displays "Thank you"')
+@then('the machine displays "Thank you"')
 def step_impl(context):
-    assert context.vending_machine.display == "Thank you"
+    assert context.vending_machine.display == 'Thank You'
 
+@when('I have inserted "{quantity}" "{coin}"')
+def step_impl(context, quantity, coin):
+    for i in range(int(quantity)):
+        context.vending_machine.insert_coins(Coin(float(coin)))
 
-@given(u'I order "Cola" for "1.00"')
-def step_impl(context):
-   context.vending_machine = VendingMachine(Product('Chips', .50), CoinValidator())
-   context.vending_machine.order_item("Cola", 1.00)
+@given('I purchase an item for "{price}"')
+def step_impl(context, price):
+    context.price = float(price)
 
+@given('I have inserted "{payment}"')
+def step_impl(context, payment):
+    context.payment = float(payment)
 
-
-@when(u'I have inserted "4" "Quarter"')
-def step_impl(context):
-    context.vending_machine.insert_coin(Quarter())
-    context.vending_machine.insert_coin(Quarter())
-    context.vending_machine.insert_coin(Quarter())
-    context.vending_machine.insert_coin(Quarter())
-
-
-@given(u'I order "Candy" for ".65"')
-def step_impl(context):
-   context.vending_machine = VendingMachine(Product('Chips', .50), CoinValidator())
-   context.vending_machine.order_item("Candy", .65)
-
-
-@when(u'I have inserted "1" "Dime"')
-def step_impl(context):
-    context.vending_machine.insert_coin(Dime())
-
-
-@when(u'I have inserted "1" "Nickle"')
-def step_impl(context):
-    context.vending_machine.insert_coin(Nickel())
-
-
-@then(u'the machine displays "Insert Coins"')
-def step_impl(context):
-    assert context.vending_machine.display == "Insert Coins"
+@when('I insert another "{payment}"')
+def step_impl(context, payment):
+    context.vending_machine.insert_coins(Coin(float(payment)))
